@@ -73,6 +73,16 @@ class Modelo:
         self.desconectar_db()        
 
         
+    def aplicar_filtro(self,parametros):       
         
+        self.conectar_db()
+        sql = '''SELECT * FROM tareas where titulo like Value CONCAT('%,?,%') AND fecha_hora_desde >=Value(?) AND fecha_hora_hasta <=Value(?) AND contacto = value(?) AND tipo = value(?) order by id_tarea asc''',(parametros[0],int(parametros[1]), int(parametros[2]), parametros[3], parametros[4])
+        print(sql)
+        tabla = self.cur.execute(sql)
+        print("despues")
+        return(tabla)
+        
+        
+         
         
         

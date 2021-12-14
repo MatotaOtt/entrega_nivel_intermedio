@@ -7,6 +7,7 @@ Created on Wed Nov 24 23:06:31 2021
 from tkinter.messagebox import askquestion
 import modelo
 import vista
+from datetime import datetime, date
 
 
 class Controlador:
@@ -68,7 +69,25 @@ class Controlador:
         self.mi_vista.habilitar_filtrar_cancelar()
         self.mi_vista.limpiar_filtros()
         self.mi_vista.habilitar_entrys()
-        
+        self.mi_vista.hora_desde.config(state="disable") 
+        self.mi_vista.minuto_desde.config(state="disable") 
+        self.mi_vista.hora_hasta.config(state="disable") 
+        self.mi_vista.minuto_hasta.config(state="disable")
+        self.mi_vista.e4.config(state="disable")
+        self.mi_vista.e7.config(state="disable")        
+        self.mi_vista.e8.config(state="disable")
+        self.mi_vista.e2.set_date(date.today())
+        self.mi_vista.e3.set_date(date.today())
+         
         
     def aplicar_filtro(self):
-        pass
+        self.mi_vista.limpiar_tree()
+        parametros=self.mi_vista.filtro_Get()
+        tabla=self.mi_modelo.aplicar_filtro(parametros)
+        
+        for fila in tabla:
+            self.mi_vista.tree.insert('', 'end', values=(fila[0], fila[1], datetime.fromtimestamp(int(fila[2])).strftime('%d/%m/%Y %H:%M:%S'), datetime.fromtimestamp(int(fila[3])).strftime('%d/%m/%Y %H:%M:%S'), fila[4], fila[5], fila[6], fila[7], fila[8]))
+        self.mi_modelo.desconectar_db()   
+        
+        
+        

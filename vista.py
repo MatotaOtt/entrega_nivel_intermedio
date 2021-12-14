@@ -300,6 +300,7 @@ class Vista:
         self.e8.config(state="normal") 
         self.e7.delete(0,'end')
         self.e8.delete(0,'end')
+        
        
    
     def get_parametros(self):
@@ -357,16 +358,12 @@ class Vista:
         self.e8.insert(0,self.tree.item(self.tree.selection())['values'][8])
         
 
-        
-    def cerrar_modificacion(self):
-        showinfo(title="Modificacion", message="Se ha modificado un o varios valores")
-        self.id_ultima_fila = self.tree.get_children()[-1]        
-        self.tree.focus(self.id_ultima_fila)
-        self.tree.selection_set(self.id_ultima_fila)
-        self.tree.yview_moveto(1)
-        self.habilitar_abm()        
-        self.deshabilitar_guardar_cancelar_Modificar() 
-        self.limpiar_entrys()
-        self.deshabilitar_entrys()
+    def filtro_Get(self):      
+        self.hora_desde_formato_completo = self.hora_desde.get() + ":" + self.minuto_desde.get() + ":00" 
+        self.hora_hasta_formato_completo = self.hora_hasta.get() + ":" + self.minuto_hasta.get() + ":00" 
+        self.fecha1_timestamp = str(time.mktime(datetime.strptime(str(self.e2.get_date())+ " " + self.hora_desde_formato_completo, "%Y-%m-%d %H:%M:%S").timetuple()))
+        self.fecha2_timestamp = str(time.mktime(datetime.strptime(str(self.e3.get_date())+ " " + self.hora_hasta_formato_completo, "%Y-%m-%d %H:%M:%S").timetuple()))
+        return (self.e1.get(), int(float(self.fecha1_timestamp)), int(float(self.fecha2_timestamp)), self.e5.get(), self.e6.get())
+    
          
-       
+   
