@@ -11,6 +11,7 @@ from tkinter.ttk import Combobox
 import time
 from datetime import datetime, date
 
+
 class Vista:
     def __init__(self, controlador):
         self.controlador = controlador
@@ -79,6 +80,7 @@ class Vista:
         self.boton3 = Button(self.ventana1, text ="Modificar", command = controlador.modificacion)
         self.boton4 = Button(self.ventana1, text ="Buscar", command = controlador.buscar)
         self.boton5 = Button(self.ventana1, text ="Guardar", command = controlador.guardar)
+        self.botonGuardarModificar = Button(self.ventana1, text ="Guardar", command = controlador.guardar_Modifica)
         self.boton6 = Button(self.ventana1, text ="Cancelar", command = self.cancelar)
         self.boton7 = Button(self.ventana1, text ="Aplicar Filtro", command = controlador.aplicar_filtro)
         self.boton8 = Button(self.ventana1, text ="Cancelar", command = self.cancelar)
@@ -88,6 +90,7 @@ class Vista:
         self.boton3.grid(row=5, column=2,sticky = "EWNS") #ubico adentro de la ventana
         self.boton4.grid(row=5, column=3,sticky = "EWNS") #ubico adentro de la ventana
         self.boton5.grid(row=6, column=2,sticky = "EWNS") #ubico adentro de la ventana
+        self.botonGuardarModificar.grid(row=6, column=2,sticky = "EWNS") #ubico adentro de la ventana
         self.boton6.grid(row=6, column=3,sticky = "EWNS") #ubico adentro de la ventana
         self.boton7.grid(row=6, column=2,sticky = "EWNS") #ubico adentro de la ventana
         self.boton8.grid(row=6, column=3,sticky = "EWNS") #ubico adentro de la ventana
@@ -125,6 +128,7 @@ class Vista:
         self.deshabilitar_filtrar_cancelar()
         self.limpiar_filtros()
         self.deshabilitar_entrys()
+        self.deshabilitar_guardar_cancelar_Modificar()
         
     def main_loop(self):    
         self.ventana1.mainloop()
@@ -209,12 +213,24 @@ class Vista:
         self.boton6.config(state = "disable")
         self.grid_hide(self.boton5)
         self.grid_hide(self.boton6)
+        
+    def deshabilitar_guardar_cancelar_Modificar(self):
+        self.botonGuardarModificar.config(state = "disable")
+        self.boton6.config(state = "disable")
+        self.grid_hide(self.botonGuardarModificar)
+        self.grid_hide(self.boton6)
     
         
     def habilitar_guardar_cancelar(self):
         self.boton5.grid()
         self.boton6.grid()
         self.boton5.config(state = "normal")
+        self.boton6.config(state = "normal")
+    
+    def habilitar_guardar_cancelar_Modificar(self):
+        self.botonGuardarModificar.grid()
+        self.boton6.grid()
+        self.botonGuardarModificar.config(state = "normal")
         self.boton6.config(state = "normal")
         
 
@@ -262,6 +278,7 @@ class Vista:
             self.habilitar_abm()
             self.limpiar_filtros()            
             self.deshabilitar_guardar_cancelar()
+            self.deshabilitar_guardar_cancelar_Modificar() 
             #self.limpiar_entrys()
             self.deshabilitar_entrys()
             self.deshabilitar_filtrar_cancelar()
@@ -308,3 +325,48 @@ class Vista:
         self.deshabilitar_guardar_cancelar()
         self.limpiar_entrys()
         self.deshabilitar_entrys()
+        
+    def modificar_datos(self,id_a_modificar):
+        self.habilitar_entrys()
+        self.habilitar_guardar_cancelar_Modificar()
+        self.e2.delete(0, 'end')
+        self.e3.delete(0, 'end')
+        self.hora_desde.delete(0, 'end')
+        self.minuto_desde.delete(0, 'end')
+        self.hora_hasta.delete(0, 'end')
+        self.minuto_hasta.delete(0, 'end')
+        self.e1.delete(0, 'end')        
+        self.e4.delete(0, 'end')
+        self.e5.delete(0, 'end')
+        self.e6.delete(0, 'end')
+        self.e7.delete(0, 'end')
+        self.e8.delete(0, 'end')   
+        
+        
+        self.e1.insert(0,self.tree.item(self.tree.selection())['values'][1])
+        self.e2.insert(0,self.tree.item(self.tree.selection())['values'][2][0:10])
+        self.hora_desde.insert(0,self.tree.item(self.tree.selection())['values'][2][11:13])
+        self.minuto_desde.insert(0,self.tree.item(self.tree.selection())['values'][2][14:16])
+        self.e3.insert(0,self.tree.item(self.tree.selection())['values'][3][0:10])
+        self.hora_hasta.insert(0,self.tree.item(self.tree.selection())['values'][3][11:13])
+        self.minuto_hasta.insert(0,self.tree.item(self.tree.selection())['values'][3][14:16])
+        self.e4.insert(0,self.tree.item(self.tree.selection())['values'][4])
+        self.e5.insert(0,self.tree.item(self.tree.selection())['values'][5])
+        self.e6.insert(0,self.tree.item(self.tree.selection())['values'][6])
+        self.e7.insert(0,self.tree.item(self.tree.selection())['values'][7])
+        self.e8.insert(0,self.tree.item(self.tree.selection())['values'][8])
+        
+
+        
+    def cerrar_modificacion(self):
+        showinfo(title="Modificacion", message="Se ha modificado un o varios valores")
+        self.id_ultima_fila = self.tree.get_children()[-1]        
+        self.tree.focus(self.id_ultima_fila)
+        self.tree.selection_set(self.id_ultima_fila)
+        self.tree.yview_moveto(1)
+        self.habilitar_abm()        
+        self.deshabilitar_guardar_cancelar_Modificar() 
+        self.limpiar_entrys()
+        self.deshabilitar_entrys()
+         
+       

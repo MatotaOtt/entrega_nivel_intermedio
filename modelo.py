@@ -7,6 +7,7 @@ Created on Wed Nov 24 21:59:15 2021
 
 import sqlite3
 
+
 class Modelo:
     def __init__(self, controlador):
         self.con = sqlite3.connect('tareas.db')
@@ -45,13 +46,14 @@ class Modelo:
     
     def baja(self,id_a_eliminar):
         self.conectar_db()
-        self.cur.execute('''DELETE FROM tareas WHERE id_tarea = ?''', (str(id_a_eliminar)))
+        self.cur.execute('''DELETE FROM tareas WHERE id_tarea = ''' + (str(id_a_eliminar)))
         self.con.commit()
         self.desconectar_db()
         
-    def modificacion(self,id_a_modificar, titulo, fecha_hora_desde, fecha_hora_hasta, nota, contacto, tipo, recordar_cada_tipo, recordar_cada_cantidad):    
-        self.conectar_db()
-        self.cur.execute('''UPDATE tareas set titulo = ?, fecha_hora_desde = ?, fecha_hora_hasta = ?, nota = ?, contacto = ?, tipo = ?, recordar_cada_tipo = ?, recordar_cada_cantidad = ? where id_tarea = ?''', (titulo,int(fecha_hora_desde), int(fecha_hora_hasta), nota, contacto, tipo, recordar_cada_tipo, int(recordar_cada_cantidad), int(id_a_modificar)))
+    
+    def modificacion(self,parametros,id):        
+        self.conectar_db()           
+        self.cur.execute('''UPDATE tareas SET  titulo = ?, fecha_hora_desde = ?, fecha_hora_hasta = ?, nota = ?, contacto = ?, tipo = ?, recordar_cada_tipo = ?, recordar_cada_cantidad = ? WHERE id_tarea = ?''',(parametros[0],int(parametros[1]), int(parametros[2]), parametros[3], parametros[4], parametros[5], parametros[6], int(parametros[7]),id))
         self.con.commit()
         self.desconectar_db()        
         
@@ -70,7 +72,7 @@ class Modelo:
         return tabla
         self.desconectar_db()        
 
-
+        
         
         
         
