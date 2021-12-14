@@ -63,5 +63,12 @@ class Controlador:
         else:
             self.mi_vista.cancelar()
     
-    def buscar(self): a=0
-    def aplicar_filtro(self): a=0
+    def buscar(self):
+        self.mi_vista.deshabilitar_abm()
+        self.mi_vista.habilitar_filtrar_cancelar()
+        self.mi_vista.limpiar_filtros()
+        self.mi_vista.habilitar_entrys()
+        
+        
+    def aplicar_filtro(self):
+        pass
