@@ -35,25 +35,21 @@ class Controlador:
 
 
     def baja(self):
-        id_a_eliminar=self.mi_vista.tree.item(self.mi_vista.tree.selection())['values'][0]
-        nombre_evento=self.mi_vista.tree.item(self.mi_vista.tree.selection())['values'][1]        
-        Cuadrodialogo= askquestion(title="Alerta", message="¿Esta seguro que quiere eliminar este evento con nombre "+str(nombre_evento)+" ?")
-        if Cuadrodialogo=="yes":
-            self.mi_modelo.baja(id_a_eliminar)
-        else:
-            pass
-        self.listar()
-        
-    def modificacion(self):
-        self.mi_vista.deshabilitar_abm()
-        id_a_modificar=self.mi_vista.tree.item(self.mi_vista.tree.selection())['values'][0]
-        self.mi_vista.modificar_datos(id_a_modificar)      
+        id_a_eliminar = self.mi_vista.get_id_a_modificar_eliminar()           
+        if id_a_eliminar > 0:
+            Cuadrodialogo = askquestion(title="Alerta", message="¿Esta seguro que quiere eliminar la tarea con Id: "+str(id_a_eliminar)+" ?")
+            if Cuadrodialogo == "yes":
+                self.mi_modelo.baja(id_a_eliminar)
+            self.listar()
+            self.mi_vista.limpiar_id_a_modificar_eliminar()
+ 
         
   
     def guardar_Modifica(self):
         parametros = self.mi_vista.get_parametros()
-        id_a_modificar=self.mi_vista.tree.item(self.mi_vista.tree.selection())['values'][0]
-        Cuadrodialogo= askquestion(title="Alerta", message="¿Esta seguro que quiere modificar el evento con seleccionado ")    
+        id_a_modificar = self.mi_vista.get_id_a_modificar_eliminar()  #tree.item(self.mi_vista.tree.selection())['values'][0]
+        
+        Cuadrodialogo= askquestion(title="Alerta", message="¿Esta seguro que quiere modificar el evento seleccionado?")    
         if Cuadrodialogo=="yes":
             self.mi_modelo.modificacion(parametros,id_a_modificar)     
             self.mi_vista.limpiar_filtros()        
@@ -63,31 +59,11 @@ class Controlador:
             self.listar()       
         else:
             self.mi_vista.cancelar()
+        self.mi_vista.limpiar_id_a_modificar_eliminar()
     
-    def buscar(self):
+    def buscar(self):              ##################################### CORRGIR encapsulamiento
         self.mi_vista.deshabilitar_abm()
         self.mi_vista.habilitar_filtrar_cancelar()
-        self.mi_vista.limpiar_filtros()
         self.mi_vista.habilitar_entrys()
-        self.mi_vista.hora_desde.config(state="disable") 
-        self.mi_vista.minuto_desde.config(state="disable") 
-        self.mi_vista.hora_hasta.config(state="disable") 
-        self.mi_vista.minuto_hasta.config(state="disable")
-        self.mi_vista.e4.config(state="disable")
-        self.mi_vista.e7.config(state="disable")        
-        self.mi_vista.e8.config(state="disable")
-        self.mi_vista.e2.set_date(date.today())
-        self.mi_vista.e3.set_date(date.today())
-         
-        
-    def aplicar_filtro(self):
-        self.mi_vista.limpiar_tree()
-        parametros=self.mi_vista.filtro_Get()
-        tabla=self.mi_modelo.aplicar_filtro(parametros)
-        
-        for fila in tabla:
-            self.mi_vista.tree.insert('', 'end', values=(fila[0], fila[1], datetime.fromtimestamp(int(fila[2])).strftime('%d/%m/%Y %H:%M:%S'), datetime.fromtimestamp(int(fila[3])).strftime('%d/%m/%Y %H:%M:%S'), fila[4], fila[5], fila[6], fila[7], fila[8]))
-        self.mi_modelo.desconectar_db()   
-        
-        
+        self.mi_vista.limpiar_filtros()
         

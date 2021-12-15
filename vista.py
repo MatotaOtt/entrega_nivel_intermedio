@@ -13,6 +13,12 @@ from datetime import datetime, date
 
 
 class Vista:
+    #ATRIBUTOS
+    id_a_eiminar_modificar = 0
+    
+    
+    
+    #METODOS
     def __init__(self, controlador):
         self.controlador = controlador
         ### Ventana 
@@ -55,9 +61,9 @@ class Vista:
         self.minuto_hasta = Spinbox(self.f2,from_=0,to=59,wrap=True,textvariable=self.minstr_hasta,width=2,state="readonly")
         self.e4 = Entry(self.ventana1) #crea entry
         self.e5 = Entry(self.ventana1) #crea entry 
-        self.e6_sv = StringVar() #crea una variable asociada a e6
+        #self.e6_sv = StringVar() #crea una variable asociada a e6
        # self.e6_sv.trace("w", self.evento_modificacion_entry(self.e6_sv)) #establecre que funcion ejecutar cuando se da el evento de cambio de texto en la variable
-        self.e6 = Combobox(self.ventana1, textvariable=self.e6_sv, values=["Tarea", "Evento", "Objetivo"]) #crea el entry pero ademasa le asocia la variable de texto para que el evento detecte el cambio
+        self.e6 = Combobox(self.ventana1,  values=["Tarea", "Evento", "Objetivo"]) #crea el entry pero ademasa le asocia la variable de texto para que el evento detecte el cambio
         self.e8 = Entry(self.ventana1) #crea entry1
         self.e7 = Combobox(self.ventana1, values=["Dias", "Semanas", "Meses"])
         self.f2.grid(row=3, column=1, sticky = "W") 
@@ -77,14 +83,14 @@ class Vista:
         ### Botones
         self.boton1 = Button(self.ventana1, text ="Agregar", command = controlador.alta)
         self.boton2 = Button(self.ventana1, text ="Eliminar", command = controlador.baja)
-        self.boton3 = Button(self.ventana1, text ="Modificar", command = controlador.modificacion)
+        self.boton3 = Button(self.ventana1, text ="Modificar", command = self.modificacion)
         self.boton4 = Button(self.ventana1, text ="Buscar", command = controlador.buscar)
         self.boton5 = Button(self.ventana1, text ="Guardar", command = controlador.guardar)
         self.botonGuardarModificar = Button(self.ventana1, text ="Guardar", command = controlador.guardar_Modifica)
         self.boton6 = Button(self.ventana1, text ="Cancelar", command = self.cancelar)
-        self.boton7 = Button(self.ventana1, text ="Aplicar Filtro", command = controlador.aplicar_filtro)
+        self.boton7 = Button(self.ventana1, text ="Aplicar Filtro", command = controlador.listar) #aplicar_filtro
         self.boton8 = Button(self.ventana1, text ="Cancelar", command = self.cancelar)
-        self.boton9 = Button(self.ventana1, text ="Limpiar Filtros", command = self.limpiar_filtros)
+        self.boton9 = Button(self.ventana1, text ="Limpiar Filtros", command = self.limpiar_filtros_y_listar)
         self.boton1.grid(row=5, column=0,sticky = "EWNS") #ubico adentro de la ventana
         self.boton2.grid(row=5, column=1,sticky = "EWNS") #ubico adentro de la ventana
         self.boton3.grid(row=5, column=2,sticky = "EWNS") #ubico adentro de la ventana
@@ -284,6 +290,12 @@ class Vista:
             self.deshabilitar_filtrar_cancelar()
             self.controlador.listar()
     
+    
+    def limpiar_filtros_y_listar(self):
+        self.limpiar_filtros()
+        self.controlador.listar()
+    
+    
     def limpiar_filtros(self):
         self.limpiar_entrys()
         #self.habilitar_filtrar_cancelar()
@@ -295,12 +307,13 @@ class Vista:
         self.e3.insert(0,"01/01/2121")
         self.hora_hasta.insert(0,"0")
         self.minuto_hasta.insert(0,"0")
-        self.e6.delete(0,'end')
         self.e7.config(state="normal")
         self.e8.config(state="normal") 
+        self.e6.delete(0,'end')
         self.e7.delete(0,'end')
         self.e8.delete(0,'end')
-        
+        print(self.e6.get())
+
        
    
     def get_parametros(self):
@@ -327,43 +340,90 @@ class Vista:
         self.limpiar_entrys()
         self.deshabilitar_entrys()
         
-    def modificar_datos(self,id_a_modificar):
-        self.habilitar_entrys()
-        self.habilitar_guardar_cancelar_Modificar()
-        self.e2.delete(0, 'end')
-        self.e3.delete(0, 'end')
-        self.hora_desde.delete(0, 'end')
-        self.minuto_desde.delete(0, 'end')
-        self.hora_hasta.delete(0, 'end')
-        self.minuto_hasta.delete(0, 'end')
-        self.e1.delete(0, 'end')        
-        self.e4.delete(0, 'end')
-        self.e5.delete(0, 'end')
-        self.e6.delete(0, 'end')
-        self.e7.delete(0, 'end')
-        self.e8.delete(0, 'end')   
+
+    def modificacion(self):
+            if self.get_id_a_modificar_eliminar() > 0:
+                self.deshabilitar_abm()
+                self.habilitar_guardar_cancelar_Modificar()
+                self.habilitar_entrys()
+                self.e2.delete(0,'end')
+                self.e3.delete(0,'end')
+                self.hora_desde.delete(0,'end')  
+                self.minuto_desde.delete(0,'end')
+                self.hora_hasta.delete(0,'end')  
+                self.minuto_hasta.delete(0,'end')
+                self.e8.delete(0,'end')
+                self.e1.insert(0, self.tree.item(self.curItem)["values"][1])
+                self.e2.insert(0, self.tree.item(self.curItem)["values"][2][0:10])
+                self.e3.insert(0, self.tree.item(self.curItem)["values"][3][0:10])
+                self.hora_desde.insert(0,   str(int(self.tree.item(self.curItem)["values"][2][11:13])))
+                self.minuto_desde.insert(0, str(int(self.tree.item(self.curItem)["values"][2][14:16])))
+                self.hora_hasta.insert(0,   str(int(self.tree.item(self.curItem)["values"][3][11:13])))
+                self.minuto_hasta.insert(0, str(int(self.tree.item(self.curItem)["values"][3][14:16])))        
+                self.e4.insert(0, self.tree.item(self.curItem)["values"][4])
+                self.e5.insert(0, self.tree.item(self.curItem)["values"][5])
+                self.e6.delete(0,'end')
+                self.e6.insert(0, self.tree.item(self.curItem)["values"][6])
+                self.e7.insert(0, self.tree.item(self.curItem)["values"][7])
+                self.e8.insert(0, self.tree.item(self.curItem)["values"][8])
+          
+            
+    def get_id_a_modificar_eliminar(self):
+        try:
+            self.curItem = self.tree.focus()
+            self.id_a_eiminar_modificar = self.tree.item(self.curItem)["values"][0]
+        except:
+            messagebox.showwarning("Atención", "Seleccione la fila que desea modificar")  
+            self.id_a_eiminar_modificar = 0
+        return self.id_a_eiminar_modificar
+    
+    def limpiar_id_a_modificar_eliminar(self):
+        self.id_a_eiminar_modificar = 0
         
         
-        self.e1.insert(0,self.tree.item(self.tree.selection())['values'][1])
-        self.e2.insert(0,self.tree.item(self.tree.selection())['values'][2][0:10])
-        self.hora_desde.insert(0,self.tree.item(self.tree.selection())['values'][2][11:13])
-        self.minuto_desde.insert(0,self.tree.item(self.tree.selection())['values'][2][14:16])
-        self.e3.insert(0,self.tree.item(self.tree.selection())['values'][3][0:10])
-        self.hora_hasta.insert(0,self.tree.item(self.tree.selection())['values'][3][11:13])
-        self.minuto_hasta.insert(0,self.tree.item(self.tree.selection())['values'][3][14:16])
-        self.e4.insert(0,self.tree.item(self.tree.selection())['values'][4])
-        self.e5.insert(0,self.tree.item(self.tree.selection())['values'][5])
-        self.e6.insert(0,self.tree.item(self.tree.selection())['values'][6])
-        self.e7.insert(0,self.tree.item(self.tree.selection())['values'][7])
-        self.e8.insert(0,self.tree.item(self.tree.selection())['values'][8])
+        
+        
+        
+        
+        
+    # def modificar_datos(self,id_a_modificar):
+    #     self.habilitar_entrys()
+    #     self.habilitar_guardar_cancelar_Modificar()
+    #     self.e2.delete(0, 'end')
+    #     self.e3.delete(0, 'end')
+    #     self.hora_desde.delete(0, 'end')
+    #     self.minuto_desde.delete(0, 'end')
+    #     self.hora_hasta.delete(0, 'end')
+    #     self.minuto_hasta.delete(0, 'end')
+    #     self.e1.delete(0, 'end')        
+    #     self.e4.delete(0, 'end')
+    #     self.e5.delete(0, 'end')
+    #     self.e6.delete(0, 'end')
+    #     self.e7.delete(0, 'end')
+    #     self.e8.delete(0, 'end')   
+    #     self.e1.insert(0,self.tree.item(self.tree.selection())['values'][1])
+    #     self.e2.insert(0,self.tree.item(self.tree.selection())['values'][2][0:10])
+    #     self.hora_desde.insert(0,self.tree.item(self.tree.selection())['values'][2][11:13])
+    #     self.minuto_desde.insert(0,self.tree.item(self.tree.selection())['values'][2][14:16])
+    #     self.e3.insert(0,self.tree.item(self.tree.selection())['values'][3][0:10])
+    #     self.hora_hasta.insert(0,self.tree.item(self.tree.selection())['values'][3][11:13])
+    #     self.minuto_hasta.insert(0,self.tree.item(self.tree.selection())['values'][3][14:16])
+    #     self.e4.insert(0,self.tree.item(self.tree.selection())['values'][4])
+    #     self.e5.insert(0,self.tree.item(self.tree.selection())['values'][5])
+    #     self.e6.insert(0,self.tree.item(self.tree.selection())['values'][6])
+    #     self.e7.insert(0,self.tree.item(self.tree.selection())['values'][7])
+    #     self.e8.insert(0,self.tree.item(self.tree.selection())['values'][8])
+        
+        
+        
         
 
-    def filtro_Get(self):      
-        self.hora_desde_formato_completo = self.hora_desde.get() + ":" + self.minuto_desde.get() + ":00" 
-        self.hora_hasta_formato_completo = self.hora_hasta.get() + ":" + self.minuto_hasta.get() + ":00" 
-        self.fecha1_timestamp = str(time.mktime(datetime.strptime(str(self.e2.get_date())+ " " + self.hora_desde_formato_completo, "%Y-%m-%d %H:%M:%S").timetuple()))
-        self.fecha2_timestamp = str(time.mktime(datetime.strptime(str(self.e3.get_date())+ " " + self.hora_hasta_formato_completo, "%Y-%m-%d %H:%M:%S").timetuple()))
-        return (self.e1.get(), int(float(self.fecha1_timestamp)), int(float(self.fecha2_timestamp)), self.e5.get(), self.e6.get())
+    # def filtro_Get(self):      
+    #     self.hora_desde_formato_completo = self.hora_desde.get() + ":" + self.minuto_desde.get() + ":00" 
+    #     self.hora_hasta_formato_completo = self.hora_hasta.get() + ":" + self.minuto_hasta.get() + ":00" 
+    #     self.fecha1_timestamp = str(time.mktime(datetime.strptime(str(self.e2.get_date())+ " " + self.hora_desde_formato_completo, "%Y-%m-%d %H:%M:%S").timetuple()))
+    #     self.fecha2_timestamp = str(time.mktime(datetime.strptime(str(self.e3.get_date())+ " " + self.hora_hasta_formato_completo, "%Y-%m-%d %H:%M:%S").timetuple()))
+    #     return (self.e1.get(), int(float(self.fecha1_timestamp)), int(float(self.fecha2_timestamp)), self.e5.get(), self.e6.get())
     
          
    
